@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Review Report</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 24px;
+      background: #f8f9fa;
+      color: #212529;
+    }
+    h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 12px; }
+    .summary {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin: 24px 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+    }
+    .metric { text-align: center; }
+    .metric-value { font-size: 2em; font-weight: bold; color: #3498db; }
+    .metric-label { color: #6c757d; font-size: 0.9em; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 12px; margin: 8px 0; border-radius: 4px; background: white; }
+    .rec-critical { border-left: 4px solid #e74c3c; }
+    .rec-high { border-left: 4px solid #f39c12; }
+    .rec-medium { border-left: 4px solid #3498db; }
+    .rec-low { border-left: 4px solid #27ae60; }
+    .priority { font-weight: bold; margin-right: 8px; }
+    .rec-critical .priority { color: #e74c3c; }
+    .rec-high .priority { color: #f39c12; }
+    .rec-medium .priority { color: #3498db; }
+    .rec-low .priority { color: #27ae60; }
+    footer { text-align: center; color: #6c757d; margin-top: 32px; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Code Review Report</h1>
+  
+  <div class="summary">
+    <div class="metric">
+      <div class="metric-value">25</div>
+      <div class="metric-label">Overall Score</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">1</div>
+      <div class="metric-label">Files Reviewed</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">3</div>
+      <div class="metric-label">Critical Issues</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">5</div>
+      <div class="metric-label">Tests Needed</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">5</div>
+      <div class="metric-label">Refactorings</div>
+    </div>
+  </div>
+
+  <h2>🎯 Top Recommendations</h2>
+  <ul>
+      <li class="rec-critical">
+        <span class="priority">[CRITICAL]</span>
+        <strong>Security - SQL Injection</strong>: Immediately fix all three SQL injection vulnerabilities by replacing string concatenation/interpolation with parameterized queries. All three functions (searchTodos, searchTodosByStatus, getTodosByUser) directly inject user input into SQL queries, allowing arbitrary SQL execution. The codebase already has the correct pattern in other functions (createTodo, getTodoById, etc.) using $1, $2 placeholders - apply the same pattern here.
+        <br><small>Files: src/todo.ts</small>
+      </li>
+    
+      <li class="rec-critical">
+        <span class="priority">[CRITICAL]</span>
+        <strong>Testing - Zero Coverage</strong>: Add comprehensive test coverage for all three new search functions. Currently 0% of the new functionality is tested. Critical tests needed: SQL injection prevention, input validation (null/undefined/empty), edge cases, case sensitivity, and JOIN integrity for getTodosByUser. Without tests, the security vulnerabilities cannot be verified as fixed.
+        <br><small>Files: src/todo.test.ts</small>
+      </li>
+    
+      <li class="rec-high">
+        <span class="priority">[HIGH]</span>
+        <strong>Type Safety</strong>: Fix searchTodosByStatus parameter type from string to boolean. The completed status is a boolean concept and should be typed accordingly to prevent invalid values ('yes', 'maybe', etc.) and improve type safety. This also requires updating the SQL query to handle boolean values correctly.
+        <br><small>Files: src/todo.ts</small>
+      </li>
+    
+      <li class="rec-high">
+        <span class="priority">[HIGH]</span>
+        <strong>Input Validation</strong>: Add input validation to all three search functions. Validate that keyword is non-empty and within reasonable length limits, that completed is a valid boolean value (if keeping as string), and that userId is in expected format. This prevents unnecessary database queries and potential DoS attacks.
+        <br><small>Files: src/todo.ts</small>
+      </li>
+    
+      <li class="rec-medium">
+        <span class="priority">[MEDIUM]</span>
+        <strong>Performance</strong>: Consider adding pagination support to all search functions to prevent loading excessive data. LIKE queries with leading wildcards cannot use indexes efficiently. Add limit/offset parameters or consider full-text search capabilities for better performance on large datasets.
+        <br><small>Files: src/todo.ts</small>
+      </li>
+    </ul>
+
+  <footer>
+    Generated at 2026-10-10T00:00:00Z • Duration: 178276ms
+  </footer>
+</body>
+</html>
